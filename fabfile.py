@@ -193,7 +193,7 @@ def setup_common():
     setup_user()
     setup_sudoers()
     setup_ulimit()
-    setup_do_monitoring()
+    #setup_do_monitoring()
     setup_libxml()
     setup_psql_client()
     setup_repo()
@@ -254,7 +254,7 @@ def setup_node():
 def setup_db(engine=None, skip_common=False, skip_benchmark=True):
     if not skip_common:
         setup_common()
-        setup_db_firewall()
+        #setup_db_firewall()
     setup_motd('db')
     copy_db_settings()
     if engine == "postgres":
@@ -394,7 +394,7 @@ def setup_user():
     run('rm -fr ~/.ssh/id_dsa*')
     run('ssh-keygen -t dsa -f ~/.ssh/id_dsa -N ""')
     run('touch ~/.ssh/authorized_keys')
-    put("~/.ssh/id_dsa.pub", "authorized_keys")
+    put("~sclay/.ssh/id_dsa.pub", "authorized_keys")
     run("echo \"\n\" >> ~sclay/.ssh/authorized_keys")
     run('echo `cat authorized_keys` >> ~sclay/.ssh/authorized_keys')
     run('rm authorized_keys')
@@ -738,7 +738,7 @@ def config_nginx():
     sudo("chmod 0755 /etc/init.d/nginx")
     sudo("/usr/sbin/update-rc.d -f nginx defaults")
     sudo("/etc/init.d/nginx restart")
-    copy_certificates()
+    #copy_certificates()
 
 # ===============
 # = Setup - App =

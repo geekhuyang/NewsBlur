@@ -36,7 +36,7 @@ templates/maintenance_on.html
 vendor/mms-agent/settings.py
 apps/social/spam.py
 venv
-
+.idea
 # ----------------------
 # Android
 # ----------------------
