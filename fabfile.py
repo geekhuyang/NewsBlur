@@ -1064,6 +1064,7 @@ def setup_postgres(standby=False):
     put('config/postgresql.conf', '/etc/postgresql/9.4/main/postgresql.conf', use_sudo=True)
     put('config/postgres_hba.conf', '/etc/postgresql/9.4/main/pg_hba.conf', use_sudo=True)
     sudo('mkdir -p /var/lib/postgresql/9.4/archive')
+    sudo('mkdir -p /var/lib/postgresql/9.4/main')
     sudo('chown -R postgres.postgres /etc/postgresql/9.4/main')
     sudo('chown -R postgres.postgres /var/lib/postgresql/9.4/main')
     sudo('chown -R postgres.postgres /var/lib/postgresql/9.4/archive')
