@@ -505,7 +505,7 @@ CELERYBEAT_SCHEDULE = {
 # = Mongo =
 # =========
 
-MONGO_DB = {F
+MONGO_DB = {
     'host': 'db_mongo:27017',
     'name': 'newsblur',
 }
