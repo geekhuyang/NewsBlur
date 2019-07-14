@@ -9,8 +9,9 @@ cd ~/NewsBlur
 sed -i 's/    change_shell()/    # change_shell()/g' ~/NewsBlur/fabfile.py
 sed -i 's/    copy_certificates()/    # copy_certificates()/g' ~/NewsBlur/fabfile.py
 sed -i 's/    setup_db_firewall()/    # setup_db_firewall()/g' ~/NewsBlur/fabfile.py
-
-mkdir -p ~/NewsBlur/secrets-newsblur/configs ~/NewsBlur/secrets-newsblur/settings
+mkdir -p ~/NewsBlur/secrets-newsblur/configs ~/NewsBlur/secrets-newsblur/settings ~/NewsBlur/secrets-newsblur/keys
+cp ~/.ssh/id_rsa.pub ~/NewsBlur/secrets-newsblur/keys/newsblur.key.pub
+cp ~/.ssh/id_rsa ~/NewsBlur/secrets-newsblur/keys/newsblur.key
 cp /etc/hosts ~/NewsBlur/secrets-newsblur/configs/hosts
 touch ~/NewsBlur/secrets-newsblur/configs/pgbouncer_auth.conf
 cp ~/NewsBlur/local_settings.py.template ~/NewsBlur/local_settings.py
