@@ -18,4 +18,14 @@ cp ~/NewsBlur/local_settings.py.template ~/NewsBlur/local_settings.py
 cp ~/NewsBlur/local_settings.py.template ~/NewsBlur/secrets-newsblur/configs/app_settings.py
 cp ~/NewsBlur/local_settings.py.template ~/NewsBlur/secrets-newsblur/settings/app_settings.py
 cp ~/NewsBlur/local_settings.py.template ~/NewsBlur/secrets-newsblur/settings/task_settings.py
+
+mkdir -p /srv/secrets-newsblur/configs /srv/secrets-newsblur/settings /srv/secrets-newsblur/keys
+cp ~/.ssh/id_rsa.pub /srv/secrets-newsblur/keys/newsblur.key.pub
+cp ~/.ssh/id_rsa /srv/secrets-newsblur/keys/newsblur.key
+cp /etc/hosts /srv/secrets-newsblur/configs/hosts
+touch /srv/secrets-newsblur/configs/pgbouncer_auth.conf
+cp ~/NewsBlur/local_settings.py.template /srv/secrets-newsblur/configs/app_settings.py
+cp ~/NewsBlur/local_settings.py.template /srv/secrets-newsblur/settings/app_settings.py
+cp ~/NewsBlur/local_settings.py.template /srv/secrets-newsblur/settings/task_settings.py
+
 fab -H localhost setup_all
