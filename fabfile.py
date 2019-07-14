@@ -189,7 +189,7 @@ def all():
 
 def setup_common():
     setup_installs()
-    change_shell()
+    #change_shell()
     setup_user()
     setup_sudoers()
     setup_ulimit()
