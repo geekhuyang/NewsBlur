@@ -35,4 +35,4 @@ echo 127.0.0.1 db_redis_story >> /etc/hosts
 echo 127.0.0.1 db_redis_sessions >> /etc/hosts
 echo 127.0.0.1 db_search_feed >> /etc/hosts
 echo 127.0.0.1 db_search_story >> /etc/hosts
-fab -H localhost setup_all
+#fab -H localhost setup_all
