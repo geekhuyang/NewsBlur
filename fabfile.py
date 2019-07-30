@@ -231,7 +231,7 @@ def setup_app(skip_common=False, node=False):
     setup_gunicorn(supervisor=True)
     if node:
         setup_node()
-    deploy_web()
+    # deploy_web()
     config_monit_app()
     setup_usage_monitor()
     done()
@@ -1590,6 +1590,7 @@ def deploy(fast=False, reload=False):
 @parallel
 def deploy_web(fast=False):
     role = role_for_host()
+    print("role is %s" % role)
     if role in ['work', 'search']:
         deploy_code(copy_assets=True, fast=fast, reload=True)
     else:
