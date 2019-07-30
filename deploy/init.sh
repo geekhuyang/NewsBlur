@@ -7,8 +7,8 @@ sudo pip install boto
 git clone https://github.com/madfrog2047/NewsBlur.git ~/NewsBlur
 cd ~/NewsBlur
 #sed -i 's/    change_shell()/    # change_shell()/g' ~/NewsBlur/fabfile.py
-sed -i 's/    copy_certificates()/    # copy_certificates()/g' ~/NewsBlur/fabfile.py
-sed -i 's/    setup_db_firewall()/    # setup_db_firewall()/g' ~/NewsBlur/fabfile.py
+#sed -i 's/    copy_certificates()/    # copy_certificates()/g' ~/NewsBlur/fabfile.py
+#sed -i 's/    setup_db_firewall()/    # setup_db_firewall()/g' ~/NewsBlur/fabfile.py
 mkdir -p ~/NewsBlur/secrets-newsblur/configs ~/NewsBlur/secrets-newsblur/settings ~/NewsBlur/secrets-newsblur/keys
 cp ~/.ssh/id_rsa.pub ~/NewsBlur/secrets-newsblur/keys/newsblur.key.pub
 cp ~/.ssh/id_rsa ~/NewsBlur/secrets-newsblur/keys/newsblur.key
