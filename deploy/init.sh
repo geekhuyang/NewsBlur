@@ -27,5 +27,12 @@ touch /srv/secrets-newsblur/configs/pgbouncer_auth.conf
 cp ~/NewsBlur/local_settings.py.template /srv/secrets-newsblur/configs/app_settings.py
 cp ~/NewsBlur/local_settings.py.template /srv/secrets-newsblur/settings/app_settings.py
 cp ~/NewsBlur/local_settings.py.template /srv/secrets-newsblur/settings/task_settings.py
-
+echo 127.0.0.1 db_mongo >> /etc/hosts
+echo 127.0.0.1 db_mongo_analytics >> /etc/hosts
+echo 127.0.0.1 db_redis >> /etc/hosts
+echo 127.0.0.1 db_redis_pubsub >> /etc/hosts
+echo 127.0.0.1 db_redis_story >> /etc/hosts
+echo 127.0.0.1 db_redis_sessions >> /etc/hosts
+echo 127.0.0.1 db_search_feed >> /etc/hosts
+echo 127.0.0.1 db_search_story >> /etc/hosts
 fab -H localhost setup_all
