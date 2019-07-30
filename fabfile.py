@@ -224,7 +224,7 @@ def setup_all():
 def setup_app(skip_common=False, node=False):
     if not skip_common:
         setup_common()
-    setup_app_firewall()
+    #setup_app_firewall()
     setup_motd('app')
     copy_app_settings()
     config_nginx()
@@ -290,7 +290,7 @@ def setup_db(engine=None, skip_common=False, skip_benchmark=True):
 def setup_task(queue=None, skip_common=False):
     if not skip_common:
         setup_common()
-    setup_task_firewall()
+    #setup_task_firewall()
     setup_motd('task')
     copy_task_settings()
     enable_celery_supervisor(queue)
@@ -352,7 +352,6 @@ def setup_installs():
         'python-scipy',
         'curl',
         'monit',
-        'ufw',
         'libjpeg8',
         'libjpeg62-dev',
         'libfreetype6',
@@ -744,15 +743,15 @@ def config_nginx():
 # = Setup - App =
 # ===============
 
-def setup_app_firewall():
-    sudo('ufw default deny')
-    sudo('ufw allow ssh')       # ssh
-    sudo('ufw allow 80')        # http
-    sudo('ufw allow 8000')      # gunicorn
-    sudo('ufw allow 8888')      # socket.io
-    sudo('ufw allow 8889')      # socket.io ssl
-    sudo('ufw allow 443')       # https
-    sudo('ufw --force enable')
+# def setup_app_firewall():
+#     sudo('ufw default deny')
+#     sudo('ufw allow ssh')       # ssh
+#     sudo('ufw allow 80')        # http
+#     sudo('ufw allow 8000')      # gunicorn
+#     sudo('ufw allow 8888')      # socket.io
+#     sudo('ufw allow 8889')      # socket.io ssl
+#     sudo('ufw allow 443')       # https
+#     sudo('ufw --force enable')
 
 def remove_gunicorn():
     with cd(env.VENDOR_PATH):
@@ -791,8 +790,8 @@ def setup_node_app():
     # sudo('apt-get install npm')
     sudo('sudo npm install -g npm')
     sudo('npm install -g supervisor')
-    sudo('ufw allow 8888')
-    sudo('ufw allow 4040')
+    # sudo('ufw allow 8888')
+    # sudo('ufw allow 4040')
 
 def config_node(full=False):
     sudo('rm -fr /etc/supervisor/conf.d/node.conf')
@@ -854,8 +853,8 @@ def maintenance_off():
 
 def setup_haproxy(debug=False):
     version = "1.5.14"
-    sudo('ufw allow 81')    # nginx moved
-    sudo('ufw allow 1936')  # haproxy stats
+    # sudo('ufw allow 81')    # nginx moved
+    # sudo('ufw allow 1936')  # haproxy stats
     # sudo('apt-get install -y haproxy')
     # sudo('apt-get remove -y haproxy')
     with cd(env.VENDOR_PATH):
@@ -996,48 +995,48 @@ def setup_db_monitor():
 # = Setup - DB =
 # ==============
 
-@parallel
-def setup_db_firewall():
-    ports = [
-        5432,   # PostgreSQL
-        27017,  # MongoDB
-        28017,  # MongoDB web
-        27019,  # MongoDB config
-        6379,   # Redis
-        # 11211,  # Memcached
-        3060,   # Node original page server
-        9200,   # Elasticsearch
-        5000,   # DB Monitor
-    ]
-    sudo('ufw --force reset')
-    sudo('ufw default deny')
-    sudo('ufw allow ssh')
-    sudo('ufw allow 80')
-
-    # DigitalOcean
-    for ip in set(env.roledefs['app'] +
-                  env.roledefs['db'] +
-                  env.roledefs['debug'] +
-                  env.roledefs['task'] +
-                  env.roledefs['work'] +
-                  env.roledefs['push'] +
-                  env.roledefs['www'] +
-                  env.roledefs['search'] +
-                  env.roledefs['node']):
-        sudo('ufw allow proto tcp from %s to any port %s' % (
-            ip,
-            ','.join(map(str, ports))
-        ))
-
-    # EC2
-    # for host in set(env.roledefs['ec2task']):
-    #     ip = re.search('ec2-(\d+-\d+-\d+-\d+)', host).group(1).replace('-', '.')
-    #     sudo('ufw allow proto tcp from %s to any port %s' % (
-    #         ip,
-    #         ','.join(map(str, ports))
-    #     ))
-
-    sudo('ufw --force enable')
+# @parallel
+# def setup_db_firewall():
+#     ports = [
+#         5432,   # PostgreSQL
+#         27017,  # MongoDB
+#         28017,  # MongoDB web
+#         27019,  # MongoDB config
+#         6379,   # Redis
+#         # 11211,  # Memcached
+#         3060,   # Node original page server
+#         9200,   # Elasticsearch
+#         5000,   # DB Monitor
+#     ]
+#     sudo('ufw --force reset')
+#     sudo('ufw default deny')
+#     sudo('ufw allow ssh')
+#     sudo('ufw allow 80')
+#
+#     # DigitalOcean
+#     for ip in set(env.roledefs['app'] +
+#                   env.roledefs['db'] +
+#                   env.roledefs['debug'] +
+#                   env.roledefs['task'] +
+#                   env.roledefs['work'] +
+#                   env.roledefs['push'] +
+#                   env.roledefs['www'] +
+#                   env.roledefs['search'] +
+#                   env.roledefs['node']):
+#         sudo('ufw allow proto tcp from %s to any port %s' % (
+#             ip,
+#             ','.join(map(str, ports))
+#         ))
+#
+#     # EC2
+#     # for host in set(env.roledefs['ec2task']):
+#     #     ip = re.search('ec2-(\d+-\d+-\d+-\d+)', host).group(1).replace('-', '.')
+#     #     sudo('ufw allow proto tcp from %s to any port %s' % (
+#     #         ip,
+#     #         ','.join(map(str, ports))
+#     #     ))
+#
+#     sudo('ufw --force enable')
 
 def setup_rabbitmq():
     sudo('echo "deb http://www.rabbitmq.com/debian/ testing main" | sudo tee -a /etc/apt/sources.list')
@@ -1379,11 +1378,11 @@ def setup_redis_monitor():
 # = Setup - Task =
 # ================
 
-def setup_task_firewall():
-    sudo('ufw default deny')
-    sudo('ufw allow ssh')
-    sudo('ufw allow 80')
-    sudo('ufw --force enable')
+# def setup_task_firewall():
+#     sudo('ufw default deny')
+#     sudo('ufw allow ssh')
+#     sudo('ufw allow 80')
+#     sudo('ufw --force enable')
 
 def setup_motd(role='app'):
     motd = '/etc/update-motd.d/22-newsblur-motd'
