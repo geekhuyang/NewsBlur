@@ -417,7 +417,7 @@ def setup_repo():
     sudo('mkdir -p /srv')
     sudo('chown -R %s.%s /srv' % (env.user, env.user))
     with settings(warn_only=True):
-        run('git clone https://github.com/samuelclay/NewsBlur.git %s' % env.NEWSBLUR_PATH)
+        run('git clone https://github.com/madfrog2047/NewsBlur.git %s' % env.NEWSBLUR_PATH)
     with settings(warn_only=True):
         sudo('ln -sfn /srv/code /home/%s/code' % env.user)
         sudo('ln -sfn /srv/newsblur /home/%s/newsblur' % env.user)
