@@ -114,7 +114,9 @@
         NSDictionary *story = [self.activeFeedStories objectAtIndex:i];
         NSInteger score = [NewsBlurAppDelegate computeStoryScore:[story objectForKey:@"intelligence"]];
         BOOL want = NO;
-        if (self.appDelegate.isSavedStoriesIntelligenceMode) {
+        if (self.showHiddenStories) {
+            want = YES;
+        } else if (self.appDelegate.isSavedStoriesIntelligenceMode) {
             want = [story[@"starred"] boolValue];
         } else {
             want = score >= appDelegate.selectedIntelligence || [[story objectForKey:@"sticky"] boolValue];
@@ -376,7 +378,7 @@
     [params setObject:[story objectForKey:@"story_feed_id"]
                forKey:@"story_feed_id"];
     
-    [appDelegate.networkManager POST:urlString parameters:params progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+    [appDelegate POST:urlString parameters:params success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         [self finishMarkAsRead:responseObject];
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         [self failedMarkAsRead:params];
@@ -404,7 +406,7 @@
     [params setObject:[story objectForKey:@"story_feed_id"]
                    forKey:@"feed_id"];
     
-    [appDelegate.networkManager POST:urlString parameters:params progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+    [appDelegate POST:urlString parameters:params success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         [self finishMarkAsUnread:responseObject];
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         [self failedMarkAsUnread:params];
@@ -749,7 +751,7 @@
     [params setObject:storyFeedId forKey:@"feed_id"];
     [params setObject:tags forKey:@"user_tags"];
     
-    [appDelegate.networkManager POST:urlString parameters:params progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+    [appDelegate POST:urlString parameters:params success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         [self finishMarkAsSaved:responseObject withParams:params];
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         [appDelegate queueSavedStory:story];
@@ -779,7 +781,7 @@
     [params setObject:storyHash forKey:@"story_id"];
     [params setObject:storyFeedId forKey:@"feed_id"];
     
-    [appDelegate.networkManager POST:urlString parameters:params progress:nil success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
+    [appDelegate POST:urlString parameters:params success:^(NSURLSessionDataTask * _Nonnull task, id  _Nullable responseObject) {
         [self finishMarkAsUnsaved:responseObject withParams:params];
     } failure:^(NSURLSessionDataTask * _Nullable task, NSError * _Nonnull error) {
         [appDelegate queueSavedStory:story];

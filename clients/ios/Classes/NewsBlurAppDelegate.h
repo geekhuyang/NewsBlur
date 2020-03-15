@@ -25,7 +25,6 @@
 @class DashboardViewController;
 @class FeedsMenuViewController;
 @class FeedDetailViewController;
-@class FeedDetailMenuViewController;
 @class MarkReadMenuViewController;
 @class FirstTimeUserViewController;
 @class FirstTimeUserAddSitesViewController;
@@ -77,7 +76,6 @@ SFSafariViewControllerDelegate>  {
     NewsBlurViewController *feedsViewController;
     FeedsMenuViewController *feedsMenuViewController;
     FeedDetailViewController *feedDetailViewController;
-    FeedDetailMenuViewController *feedDetailMenuViewController;
     FriendsListViewController *friendsListViewController;
     FontSettingsViewController *fontSettingsViewController;
     
@@ -175,7 +173,6 @@ SFSafariViewControllerDelegate>  {
 @property (nonatomic) IBOutlet NewsBlurViewController *feedsViewController;
 @property (nonatomic) IBOutlet FeedsMenuViewController *feedsMenuViewController;
 @property (nonatomic) IBOutlet FeedDetailViewController *feedDetailViewController;
-@property (nonatomic) IBOutlet FeedDetailMenuViewController *feedDetailMenuViewController;
 @property (nonatomic, strong) UINavigationController *feedDetailMenuNavigationController;
 @property (nonatomic) IBOutlet FriendsListViewController *friendsListViewController;
 @property (nonatomic) IBOutlet StoryDetailViewController *storyDetailViewController;
@@ -233,9 +230,12 @@ SFSafariViewControllerDelegate>  {
 @property (readwrite) NSInteger savedStoriesCount;
 @property (readwrite) NSInteger totalUnfetchedStoryCount;
 @property (readwrite) NSInteger remainingUnfetchedStoryCount;
+@property (readwrite) NSInteger totalUncachedTextCount;
+@property (readwrite) NSInteger remainingUncachedTextCount;
 @property (readwrite) NSInteger totalUncachedImagesCount;
 @property (readwrite) NSInteger remainingUncachedImagesCount;
 @property (readwrite) NSInteger latestFetchedStoryDate;
+@property (readwrite) NSInteger latestCachedTextDate;
 @property (readwrite) NSInteger latestCachedImageDate;
 @property (readwrite) NSInteger selectedIntelligence;
 @property (readwrite) NSMutableDictionary * recentlyReadStories;
@@ -307,10 +307,13 @@ SFSafariViewControllerDelegate>  {
 - (void)showFindFriends;
 - (void)showMuteSites;
 - (void)showOrganizeSites;
+- (void)showWidgetSites;
 - (void)showPremiumDialog;
 - (void)showPreferences;
+- (void)setHiddenPreferencesAnimated:(BOOL)animated;
 - (void)resizePreviewSize;
 - (void)resizeFontSize;
+- (void)popToRootWithCompletion:(void (^)(void))completion;
 
 - (void)showMoveSite;
 - (void)openTrainSite;
@@ -318,6 +321,7 @@ SFSafariViewControllerDelegate>  {
 - (void)openNotificationsWithFeed:(NSString *)feedId sender:(id)sender;
 - (void)updateNotifications:(NSDictionary *)params feed:(NSString *)feedId;
 - (void)checkForFeedNotifications;
+- (void)openStatisticsWithFeed:(NSString *)feedId sender:(id)sender;
 - (void)openTrainSiteWithFeedLoaded:(BOOL)feedLoaded from:(id)sender;
 - (void)openTrainStory:(id)sender;
 - (void)openUserTagsStory:(id)sender;
@@ -334,11 +338,28 @@ SFSafariViewControllerDelegate>  {
 - (void)adjustStoryDetailWebView;
 - (void)calibrateStoryTitles;
 - (void)recalculateIntelligenceScores:(id)feedId;
+
 - (void)cancelRequests;
+
+- (void)GET:(NSString *)urlString parameters:(id)parameters
+    success:(void (^)(NSURLSessionDataTask *, id))success
+    failure:(void (^)(NSURLSessionDataTask *, NSError *))failure;
+- (void)GET:(NSString *)urlString parameters:(id)parameters target:(id)target
+    success:(SEL)success
+    failure:(SEL)failure;
+- (void)POST:(NSString *)urlString parameters:(id)parameters
+     success:(void (^)(NSURLSessionDataTask *, id))success
+     failure:(void (^)(NSURLSessionDataTask *, NSError *))failure;
+- (void)POST:(NSString *)urlString parameters:(id)parameters target:(id)target
+     success:(SEL)success
+     failure:(SEL)failure;
+
 - (void)loadFolder:(NSString *)folder feedID:(NSString *)feedIdStr;
 - (void)reloadFeedsView:(BOOL)showLoader;
 - (void)setTitle:(NSString *)title;
 - (void)showOriginalStory:(NSURL *)url;
+- (void)showInAppBrowser:(NSURL *)url withCustomTitle:(NSString *)customTitle fromSender:(id)sender;
+- (void)showSafariViewControllerWithURL:(NSURL *)url useReader:(BOOL)useReader;
 - (void)closeOriginalStory;
 - (void)hideStoryDetailView;
 - (void)changeActiveFeedDetailRow;
@@ -409,6 +430,7 @@ SFSafariViewControllerDelegate>  {
 - (NSString *)extractFolderName:(NSString *)folderName;
 - (NSString *)extractParentFolderName:(NSString *)folderName;
 - (NSArray *)parentFoldersForFeed:(NSString *)feedId;
+- (NSDictionary *)getFeedWithId:(id)feedId;
 - (NSDictionary *)getFeed:(NSString *)feedId;
 - (NSDictionary *)getStory:(NSString *)storyHash;
 
@@ -433,6 +455,7 @@ SFSafariViewControllerDelegate>  {
 - (void)cancelOfflineQueue;
 - (void)startOfflineQueue;
 - (void)startOfflineFetchStories;
+- (void)startOfflineFetchText;
 - (void)startOfflineFetchImages;
 - (BOOL)isReachableForOffline;
 - (void)storeUserProfiles:(NSArray *)userProfiles;
@@ -442,6 +465,7 @@ SFSafariViewControllerDelegate>  {
 - (void)flushQueuedReadStories:(BOOL)forceCheck withCallback:(void(^)(void))callback;
 - (void)syncQueuedReadStories:(FMDatabase *)db withStories:(NSDictionary *)hashes withCallback:(void(^)(void))callback;
 - (void)queueSavedStory:(NSDictionary *)story;
+- (void)fetchTextForStory:(NSString *)storyHash inFeed:(NSString *)feedId checkCache:(BOOL)checkCache withCallback:(void(^)(NSString *))callback;
 - (void)prepareActiveCachedImages:(FMDatabase *)db;
 - (void)cleanImageCache;
 - (void)deleteAllCachedImages;

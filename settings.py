@@ -48,7 +48,7 @@ SERVER_NAME  = 'newsblur'
 SERVER_EMAIL = 'server@newsblur.com'
 HELLO_EMAIL  = 'hello@newsblur.com'
 NEWSBLUR_URL = 'http://www.newsblur.com'
-IMAGES_URL   = 'https://images.newsblur.com'
+IMAGES_URL   = 'https://imageproxy.newsblur.com'
 SECRET_KEY            = 'YOUR_SECRET_KEY'
 IMAGES_SECRET_KEY = "YOUR_SECRET_IMAGE_KEY"
 
@@ -131,7 +131,7 @@ OAUTH2_PROVIDER = {
     'SCOPES': {
         'read': 'View new unread stories, saved stories, and shared stories.',
         'write': 'Create new saved stories, shared stories, and subscriptions.',
-        'ifttt': 'Pair your NewsBlur account with other IFTTT channels.',
+        'ifttt': 'Pair your NewsBlur account with other services.',
     },
     'CLIENT_ID_GENERATOR_CLASS': 'oauth2_provider.generators.ClientIdGenerator',
     'ACCESS_TOKEN_EXPIRE_SECONDS': 60*60*24*365*10, # 10 years
@@ -479,9 +479,14 @@ CELERYBEAT_SCHEDULE = {
         'schedule': datetime.timedelta(hours=12),
         'options': {'queue': 'beat_tasks', 'timeout': 720*10},
     },
+    'reimport-stripe-history': {
+        'task': 'reimport-stripe-history',
+        'schedule': datetime.timedelta(hours=6),
+        'options': {'queue': 'beat_tasks'},
+    },
     'clean-spam': {
         'task': 'clean-spam',
-        'schedule': datetime.timedelta(hours=6),
+        'schedule': datetime.timedelta(hours=1),
         'options': {'queue': 'beat_tasks'},
     },
     'clean-social-spam': {

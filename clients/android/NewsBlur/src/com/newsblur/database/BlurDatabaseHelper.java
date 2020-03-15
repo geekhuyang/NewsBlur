@@ -767,6 +767,7 @@ public class BlurDatabaseHelper {
         Cursor c = dbRO.query(DatabaseConstants.FEED_TABLE, null, selection, selArgs, null, null, null);
         while (c.moveToNext()) {
             Feed f = Feed.fromCursor(c);
+            if(!f.active) continue;
             result += f.positiveCount;
             if ((stateFilter == StateFilter.SOME) || (stateFilter == StateFilter.ALL)) result += f.neutralCount;
             if (stateFilter == StateFilter.ALL) result += f.negativeCount;
@@ -1103,6 +1104,28 @@ public class BlurDatabaseHelper {
                 return getActiveStoriesCursor(fs, order, cancellationSignal);
             }
         };
+    }
+
+    public Loader<Cursor> getStoriesLoader(final FeedSet fs) {
+//        final StoryOrder order = PrefsUtils.getStoryOrder(context, fs);
+        return new QueryCursorLoader(context) {
+            @Override
+            protected Cursor createCursor() {
+                return getStoriesCursor(fs, cancellationSignal);
+            }
+        };
+    }
+
+    private Cursor getStoriesCursor(FeedSet fs, CancellationSignal cancellationSignal) {
+        StringBuilder q = new StringBuilder(DatabaseConstants.STORY_QUERY_BASE_0);
+
+        q.append(DatabaseConstants.STORY_FEED_ID);
+        q.append(" = ");
+        q.append(fs.getSingleFeed());
+        q.append(" ORDER BY ");
+        q.append(DatabaseConstants.STORY_TIMESTAMP);
+        q.append(" DESC LIMIT 10");
+        return rawQuery(q.toString(), null, cancellationSignal);
     }
 
     private Cursor getActiveStoriesCursor(FeedSet fs, StoryOrder order, CancellationSignal cancellationSignal) {

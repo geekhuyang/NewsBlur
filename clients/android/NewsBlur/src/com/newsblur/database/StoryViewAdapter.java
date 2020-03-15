@@ -1,5 +1,6 @@
 package com.newsblur.database;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.Typeface;
@@ -18,6 +19,7 @@ import android.view.ViewGroup;
 import android.view.ViewParent;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import butterknife.Bind;
@@ -30,6 +32,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.newsblur.R;
+import com.newsblur.activity.FeedItemsList;
+import com.newsblur.activity.ItemsList;
 import com.newsblur.activity.NbActivity;
 import com.newsblur.domain.Story;
 import com.newsblur.domain.UserDetails;
@@ -42,6 +46,7 @@ import com.newsblur.util.ImageLoader;
 import com.newsblur.util.PrefsUtils;
 import com.newsblur.util.StoryListStyle;
 import com.newsblur.util.StoryUtils;
+import com.newsblur.util.ThumbnailStyle;
 import com.newsblur.util.UIUtils;
 
 /**
@@ -391,11 +396,12 @@ public class StoryViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 return true;
 
             case R.id.menu_save_story:
-                FeedUtils.setStorySaved(story, true, context);
+                //TODO get folder name
+                FeedUtils.setStorySaved(story, true, context, null);
                 return true;
 
             case R.id.menu_unsave_story:
-                FeedUtils.setStorySaved(story, false, context);
+                FeedUtils.setStorySaved(story, false, context, null);
                 return true;
 
             case R.id.menu_intel:
@@ -404,6 +410,11 @@ public class StoryViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                 intelFrag.show(context.getSupportFragmentManager(), StoryIntelTrainerFragment.class.getName());
                 return true;
 
+            case R.id.menu_go_to_feed:
+                FeedSet fs = FeedSet.singleFeed(story.feedId);
+                FeedItemsList.startActivity(context, fs,
+                        FeedUtils.getFeed(story.feedId), null);
+                return true;
             default:
                 return false;
             }
@@ -443,10 +454,10 @@ public class StoryViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
                     FeedUtils.markStoryUnread(story, context);
                     break;
                 case GEST_ACTION_SAVE:
-                    FeedUtils.setStorySaved(story, true, context);
+                    FeedUtils.setStorySaved(story, true, context, null);
                     break;
                 case GEST_ACTION_UNSAVE:
-                    FeedUtils.setStorySaved(story, false, context);
+                    FeedUtils.setStorySaved(story, false, context, null);
                     break;
                 case GEST_ACTION_NONE:
                 default:
@@ -510,11 +521,12 @@ public class StoryViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
      */
     private void bindCommon(StoryViewHolder vh, int position, Story story) {
         if ((vh instanceof StoryTileViewHolder) ||
-            ((PrefsUtils.isShowThumbnails(context)) && (story.thumbnailUrl != null))) {
+            ((PrefsUtils.getThumbnailStyle(context)  != ThumbnailStyle.OFF) && (story.thumbnailUrl != null))) {
             // when first created, tiles' views tend to not yet have their dimensions calculated, but
             // upon being recycled they will often have a known size, which lets us give a max size to
             // the image loader, which in turn can massively optimise loading.  the image loader will
             // reject nonsene values
+
             int thumbSizeGuess = vh.thumbView.getMeasuredHeight();
             // there is a not-unlikely chance that the recycler will re-use a tile for a story with the
             // same thumbnail.  only load it if it is different.
@@ -548,7 +560,7 @@ public class StoryViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
         }
 
         vh.storyTitleView.setText(UIUtils.fromHtml(story.title));
-        vh.storyDate.setText(StoryUtils.formatShortDate(context, new Date(story.timestamp)));
+        vh.storyDate.setText(StoryUtils.formatShortDate(context, story.timestamp));
 
         // lists with mixed feeds get added info, but single feeds do not
         if (!singleFeed) {
@@ -626,6 +638,16 @@ public class StoryViewAdapter extends RecyclerView.Adapter<RecyclerView.ViewHold
 
         vh.storyAuthor.setTextSize(textSize * defaultTextSize_story_item_author);
         vh.storySnippet.setTextSize(textSize * defaultTextSize_story_item_snip);
+
+        ThumbnailStyle thumbnailStyle = PrefsUtils.getThumbnailStyle(context);
+        int sizeRes = thumbnailStyle == ThumbnailStyle.SMALL ? R.dimen.thumbnails_small_size : R.dimen.thumbnails_size;
+        int sizeDp = context.getResources().getDimensionPixelSize(sizeRes);
+
+        RelativeLayout.LayoutParams params = (RelativeLayout.LayoutParams) vh.thumbView.getLayoutParams();
+        if (params.height != sizeDp) {
+            params.height = sizeDp;
+            params.width = sizeDp;
+        }
 
         if (this.ignoreReadStatus || (! story.read)) {
             vh.storyAuthor.setAlpha(1.0f);

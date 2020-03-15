@@ -20,7 +20,6 @@
 #import "FeedTableCell.h"
 #import "FeedDetailTableCell.h"
 #import "FeedsMenuViewController.h"
-#import "FeedDetailMenuViewController.h"
 #import "FontSettingsViewController.h"
 #import "AddSiteViewController.h"
 #import "TrainerViewController.h"
@@ -211,11 +210,22 @@
             leftBorder.hidden = NO;
         }
         
-        [self adjustLayout];
+        [self adjustLayoutCompleted:NO];
     } completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
         //    leftBorder.frame = CGRectMake(0, 0, 1, CGRectGetHeight(self.view.bounds));
         
-        [self adjustLayout];
+        CGFloat currentMasterWidth = self.masterNavigationController.view.frame.size.width;
+        BOOL isInvalid = currentMasterWidth < 100.0;
+        
+        if (isInvalid) {
+            NSLog(@"Invalid width detected: %@; correcting", @(currentMasterWidth));  // log
+            
+            self.masterNavigationController.view.frame = CGRectMake(0, 0, self.masterWidth, self.view.bounds.size.height);
+        }
+        
+        if (!self.feedDetailIsVisible) {
+            [self adjustLayoutCompleted:YES];
+        }
         
         if (self.feedDetailIsVisible) {
             // Defer this in the background, to avoid misaligning the detail views
@@ -240,8 +250,8 @@
     }
 }
 
-- (void)adjustLayout {
-    if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground) {
+- (void)adjustLayoutCompleted:(BOOL)completed {
+    if ([UIApplication sharedApplication].applicationState == UIApplicationStateBackground && !completed) {
         return;
     }
     
@@ -308,14 +318,16 @@
     self.leftBorder.backgroundColor = UIColorFromRGB(0xC2C5BE).CGColor;
     self.rightBorder.backgroundColor = UIColorFromRGB(0xC2C5BE).CGColor;
     
-    self.masterNavigationController.navigationBar.tintColor = UIColorFromRGB(0x8F918B);
-    self.masterNavigationController.navigationBar.barTintColor = UIColorFromRGB(0xE3E6E0);
+    self.view.backgroundColor = UIColor.blackColor;
     
-    self.storyNavigationController.navigationBar.tintColor = UIColorFromRGB(0x8F918B);
-    self.storyNavigationController.navigationBar.barTintColor = UIColorFromRGB(0xE3E6E0);
+    self.masterNavigationController.navigationBar.tintColor = [UINavigationBar appearance].tintColor;
+    self.masterNavigationController.navigationBar.barTintColor = [UINavigationBar appearance].barTintColor;
     
-    self.originalNavigationController.navigationBar.tintColor = UIColorFromRGB(0x8F918B);
-    self.originalNavigationController.navigationBar.barTintColor = UIColorFromRGB(0xE3E6E0);
+    self.storyNavigationController.navigationBar.tintColor = [UINavigationBar appearance].tintColor;
+    self.storyNavigationController.navigationBar.barTintColor = [UINavigationBar appearance].barTintColor;
+    
+    self.originalNavigationController.navigationBar.tintColor = [UINavigationBar appearance].tintColor;
+    self.originalNavigationController.navigationBar.barTintColor = [UINavigationBar appearance].barTintColor;
     
     UIView *titleLabel = [appDelegate makeFeedTitle:appDelegate.storiesCollection.activeFeed];
     self.storyPageControl.navigationItem.titleView = titleLabel;
@@ -621,6 +633,8 @@
     CGRect vb = [self.view bounds];
     UIInterfaceOrientation orientation = [UIApplication sharedApplication].statusBarOrientation;
 	if (UIInterfaceOrientationIsPortrait(orientation) && !self.storyTitlesOnLeft) {
+        // Force the story page control to load.
+        [storyPageControl view];
         // CASE: story titles on bottom
         if (resetLayout) {
             self.storyPageControl.navigationItem.leftBarButtonItem = self.storyPageControl.buttonBack;
